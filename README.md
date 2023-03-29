@@ -75,14 +75,18 @@ Find students who scored below average in the exam and pass mark is 40%?
  
  Create a new collection which consists of students who scored below the fail mark in all the categories.
  
-    stage1= {"$and":[{"scores.0.score":{"$lt":40}},{"scores.1.score":{"$lt":40}},{"scores.2.score":{"$lt":40}}]}
-    for i in mycol.find(stage1):
+    stage1= {'$project': {'_id': 0,'name': 1,'scores': {'$filter': {'input': "$scores",'as': "score",'cond': {'$lt': ["$$score.score", 40]}}}}}
+    stage2= {'$match': {"scores.0": {'$exists': True},'$expr': {'$eq': [{'$size': "$scores"},3]}}}
+    stage3= {'$out': "failed_students"}
+    for i in mycol.find(stage1, stage2, stage3):
         print(i)
         
  Create a new collection which consists of students who scored above pass mark in all the categories.
  
-    stage1= {"$and":[{"scores.0.score":{"$gte":40}},{"scores.1.score":{"$gte":40}},{"scores.2.score":{"$gte":40}}]}
-    for i in mycol.find(stage1):
+    stage1= {'$project': {'_id': 0,'name': 1,'scores': {'$filter': {'input': "$scores",'as': "score",'cond': {'$gte': ["$$score.score", 40]}}}}}
+    stage2= {'$match': {"scores.0": {'$exists': True},'$expr': {'$eq': [{'$size': "$scores"},3]}}}
+    stage3= {'$out': "failed_students"}
+    for i in mycol.find(stage1, stage2, stage3):
         print(i)
 
  
