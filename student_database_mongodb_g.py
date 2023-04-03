@@ -69,17 +69,14 @@ for i in mycol.find(stage):
 
 # 6 Create a new collection which consists of students who scored below the fail mark in all the categories.
 
-stage1= {'$project': {'_id': 0,'name': 1,'scores': {'$filter': {'input': "$scores",'as': "score",'cond': {'$lt': ["$$score.score", 40]}}}}}
-stage2= {'$match': {"scores.0": {'$exists': True},'$expr': {'$eq': [{'$size': "$scores"},3]}}}
-stage3= {'$out': "failed_students"}
-for i in mycol.find(stage1, stage2, stage3):
-    print(i)
+stage1= {"$match":{"$and":[{"scores.0.score":{"$lt":40}},{"scores.1.score":{"$lt":40}},{"scores.2.score":{"$lt":40}}]}}
+stage2= {'$out': "failed_students"}
+for i in mycol.aggregate([stage1, stage2]):
+    print(i))
 
 # 7 Create a new collection which consists of students who scored above pass mark in all the categories.
 
-stage1= {'$project': {'_id': 0,'name': 1,'scores': {'$filter': {'input': "$scores",'as': "score",'cond': {'$gte': ["$$score.score", 40]}}}}}
-stage2= {'$match': {"scores.0": {'$exists': True},'$expr': {'$eq': [{'$size': "$scores"},3]}}}
-stage3= {'$out': "failed_students"}
-for i in mycol.find(stage1, stage2, stage3):
+stage1= {"$match":{"$and":[{"scores.0.score":{"$gte":40}},{"scores.1.score":{"$gte":40}},{"scores.2.score":{"$gte":40}}]}}
+stage2= {'$out': "passed_students"}
+for i in mycol.aggregate([stage1, stage2]):
     print(i)
-
